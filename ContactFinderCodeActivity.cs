@@ -1,11 +1,7 @@
-﻿using System.Activities;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Workflow;
-using Microsoft.Xrm.Sdk;
-using Microsoft.Xrm.Sdk.Client;
-using Microsoft.Xrm.Tooling.Connector;
+﻿using Microsoft.Xrm.Sdk;
 using Microsoft.Xrm.Sdk.Query;
-using System.Collections.Generic;
+using Microsoft.Xrm.Sdk.Workflow;
+using System.Activities;
 using System.Linq;
 
 namespace ContactFinderCodeActivity
@@ -23,27 +19,28 @@ namespace ContactFinderCodeActivity
         /// ContactReferenceOutput - reference to contact
         /// </summary>
         [RequiredArgument]
-        [Input("String input")]
+        [Input("Parameter1Input")]
         public InArgument<string> Parameter1Input { get; set; }
         [RequiredArgument]
-        [Input("String input")]
+        [Input("Parameter1FieldNameInput")]
         public InArgument<string> Parameter1FieldNameInput { get; set; }
         [RequiredArgument]
-        [Input("String input")]
+        [Input("Parameter2Input")]
         public InArgument<string> Parameter2Input { get; set; }
         [RequiredArgument]
-        [Input("String input")]
+        [Input("Parameter2FieldNameInput")]
         public InArgument<string> Parameter2FieldNameInput { get; set; }
-        [Output("Integer output")]
+        [Output("StatusOutput")]
         public OutArgument<int> StatusOutput { get; set; }
-        [Output("EntityReference output")]
-        public OutArgument<int> ContactReferenceOutput { get; set; }
+        [ReferenceTarget("contact")]
+        [Output("ContactReferenceOutput")]
+        public OutArgument<EntityReference> ContactReferenceOutput { get; set; }
         protected override void Execute(CodeActivityContext context)
         {
             IWorkflowContext workflowContext = context.GetExtension<IWorkflowContext>();
             IOrganizationServiceFactory serviceFactory = context.GetExtension<IOrganizationServiceFactory>();             
             IOrganizationService service = serviceFactory.CreateOrganizationService(workflowContext.InitiatingUserId);
-            var query = new QueryExpression("connection");
+            var query = new QueryExpression("contact");
             query.Criteria.AddCondition(new ConditionExpression(Parameter1FieldNameInput.Get(context), ConditionOperator.Equal, Parameter1Input.Get(context)));
             query.Criteria.AddCondition(new ConditionExpression(Parameter2FieldNameInput.Get(context), ConditionOperator.Equal, Parameter2Input.Get(context)));
             query.ColumnSet = new ColumnSet(true);
